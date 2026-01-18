@@ -22,125 +22,130 @@
 
     /* ヘッダー */
     header {
-        background: var(--primary); color: white; padding: 10px 20px;
+        background: var(--primary); color: white; padding: 8px 15px;
         display: flex; justify-content: space-between; align-items: center;
         box-shadow: 0 4px 10px rgba(93, 117, 214, 0.2); z-index: 10;
+        height: 50px; box-sizing: border-box;
     }
-    h1 { margin: 0; font-size: 1.2rem; font-weight: 800; }
-    .status-badge { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 10px; }
+    h1 { margin: 0; font-size: 1.1rem; font-weight: 800; }
+    .status-badge { font-size: 0.7rem; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 10px; }
 
     /* コンテナ */
     .container {
         flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        padding: 1rem; position: relative; width: 100%; max-width: 800px; margin: 0 auto; box-sizing: border-box;
+        padding: 0.5rem; position: relative; width: 100%; max-width: 800px; margin: 0 auto; box-sizing: border-box;
     }
     .screen {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: var(--bg); display: none; flex-direction: column;
-        align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; z-index: 20;
+        align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; z-index: 20;
         overflow-y: auto;
     }
     .screen.active { display: flex; }
 
     /* 共通UI */
     .card-box {
-        background: white; padding: 1.5rem; border-radius: 25px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 4px solid #f0f4ff;
+        background: white; padding: 1.2rem; border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 3px solid #f0f4ff;
         width: 100%; max-width: 500px; text-align: center;
     }
     select, input[type="text"] {
-        width: 100%; padding: 0.8rem; border: 2px solid var(--primary);
-        border-radius: 15px; font-size: 1rem; font-weight: bold;
-        color: var(--primary); background: #f0f4ff; margin-bottom: 1rem; box-sizing: border-box;
+        width: 100%; padding: 0.6rem; border: 2px solid var(--primary);
+        border-radius: 12px; font-size: 1rem; font-weight: bold;
+        color: var(--primary); background: #f0f4ff; margin-bottom: 0.8rem; box-sizing: border-box;
     }
     .big-btn {
         background: var(--primary); color: white; border: none;
-        padding: 1rem 3rem; font-size: 1.4rem; border-radius: 50px;
-        font-weight: 800; cursor: pointer; box-shadow: 0 6px 0 rgba(46, 61, 128, 0.3);
+        padding: 0.8rem 2rem; font-size: 1.3rem; border-radius: 50px;
+        font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 rgba(46, 61, 128, 0.3);
         transition: transform 0.1s; margin-top: 10px; width: 100%;
     }
     .big-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(46, 61, 128, 0.3); }
 
-    /* ★モード選択ボタン */
+    /* ★モード選択ボタン (横一列コンパクト版) */
     .mode-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; width: 100%;
+        display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-bottom: 1rem; width: 100%;
     }
     .mode-btn {
-        background: white; border: 2px solid #edeff4; border-radius: 15px;
-        padding: 1rem 0.5rem; font-weight: bold; cursor: pointer; color: #939bb4;
-        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-        transition: 0.2s;
+        background: white; border: 2px solid #edeff4; border-radius: 12px;
+        padding: 0.6rem 0.2rem; font-weight: bold; cursor: pointer; color: #939bb4;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+        transition: 0.2s; font-size: 0.8rem;
     }
     .mode-btn.active {
         background: #f0f4ff; border-color: var(--primary); color: var(--primary);
         box-shadow: 0 0 0 2px var(--primary) inset;
     }
-    .mode-icon { font-size: 1.5rem; }
+    .mode-icon { font-size: 1.2rem; margin-bottom: 2px; }
 
-    /* 設定エリア */
+    /* 設定エリア (折りたたみ式) */
+    .settings-wrapper { width: 100%; text-align: right; margin-bottom: 5px; }
+    .settings-toggle-btn {
+        background: none; border: none; color: #939bb4; font-weight: bold; cursor: pointer; font-size: 0.9rem;
+    }
     .settings-area {
-        border: 2px dashed #dce2f2; border-radius: 15px; padding: 1rem;
-        margin-bottom: 1rem; text-align: left; background: rgba(255,255,255,0.8); width: 100%; box-sizing: border-box;
+        display: none; /* デフォルト非表示 */
+        border: 2px dashed #dce2f2; border-radius: 15px; padding: 0.8rem;
+        margin-bottom: 0.8rem; text-align: left; background: rgba(255,255,255,0.8); width: 100%; box-sizing: border-box;
     }
     .setting-row {
         display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 10px; font-weight: 800; color: #7a82a0; font-size: 0.9rem;
+        margin-bottom: 8px; font-weight: 800; color: #7a82a0; font-size: 0.85rem;
     }
     /* トグル */
-    .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
+    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
         position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
         background-color: #ccc; transition: .4s; border-radius: 34px;
     }
     .slider:before {
-        position: absolute; content: ""; height: 18px; width: 18px;
-        left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;
+        position: absolute; content: ""; height: 16px; width: 16px;
+        left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
     }
     input:checked + .slider { background-color: var(--primary); }
-    input:checked + .slider:before { transform: translateX(20px); }
+    input:checked + .slider:before { transform: translateX(18px); }
 
     /* ゲーム画面 */
     .flashcard {
-        background: white; width: 100%; max-width: 600px; height: 240px;
-        border-radius: 25px; display: flex; flex-direction: column;
-        align-items: center; justify-content: center; margin-bottom: 1.5rem;
+        background: white; width: 100%; max-width: 600px; height: 220px;
+        border-radius: 20px; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; margin-bottom: 1rem;
         border: 4px solid #f0f4ff; border-bottom: 8px solid #e0e7ff; position: relative; cursor: pointer;
     }
-    .word-text { font-size: 2.8rem; font-weight: 800; line-height: 1.2; text-align: center; padding: 0 10px;}
+    .word-text { font-size: 2.5rem; font-weight: 800; line-height: 1.2; text-align: center; padding: 0 10px;}
     .sub-text { color: #939bb4; font-weight: 800; margin-top: 10px; font-size: 1rem; }
     .speaker-icon { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; z-index: 5; }
     
-    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; width: 100%; max-width: 600px; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; width: 100%; max-width: 600px; }
     .opt-btn {
-        background: white; border: 3px solid #edeff4; border-radius: 15px;
-        padding: 1rem; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.1s;
+        background: white; border: 3px solid #edeff4; border-radius: 12px;
+        padding: 0.8rem; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: 0.1s;
     }
     .opt-btn:active { transform: scale(0.98); }
 
     /* タイピング */
     .typing-box { width: 100%; max-width: 500px; text-align: center; display: none; }
     #typing-input {
-        font-size: 1.5rem; text-align: center; letter-spacing: 2px;
+        font-size: 1.4rem; text-align: center; letter-spacing: 2px;
         border: 3px solid var(--primary); background: white;
     }
-    #typing-feedback { height: 30px; font-weight: 800; margin-top: 5px; font-size: 1.2rem; }
+    #typing-feedback { height: 25px; font-weight: 800; margin-top: 5px; font-size: 1.1rem; }
 
     /* 復習リスト */
     #mistake-list {
-        text-align: left; width: 100%; max-height: 200px; overflow-y: auto;
+        text-align: left; width: 100%; max-height: 150px; overflow-y: auto;
         background: #fff5f5; border: 2px solid #ffbaba; border-radius: 15px; padding: 10px; margin-top: 10px;
         box-sizing: border-box;
     }
     .mistake-item {
-        border-bottom: 1px dashed #ffbaba; padding: 5px 0; font-weight: bold; color: #d8000c; font-size: 0.9rem;
+        border-bottom: 1px dashed #ffbaba; padding: 5px 0; font-weight: bold; color: #d8000c; font-size: 0.8rem;
     }
 
     @media (max-width: 600px) {
         .options-grid { grid-template-columns: 1fr; }
-        .word-text { font-size: 2rem; }
-        .mode-grid { gap: 5px; }
-        .mode-btn { font-size: 0.8rem; padding: 0.8rem 0.2rem; }
+        .word-text { font-size: 1.8rem; }
+        .mode-btn span { font-size: 0.7rem; } /* 文字サイズ調整 */
     }
 </style>
 </head>
@@ -166,32 +171,36 @@
             <label style="display:block; text-align:left; color:#939bb4; font-weight:800; margin-bottom:5px;">Unit Select</label>
             <select id="unitSelect"></select>
 
-            <label style="display:block; text-align:left; color:#939bb4; font-weight:800; margin-bottom:5px;">Mode Select</label>
+            <label style="display:block; text-align:left; color:#939bb4; font-weight:800; margin-bottom:5px;">Mode</label>
             <div class="mode-grid">
                 <button class="mode-btn active" onclick="selectMode('en-jp', this)">
-                    <span class="mode-icon">📝</span>英 → 日
+                    <span class="mode-icon">📝</span><span>英→日</span>
                 </button>
                 <button class="mode-btn" onclick="selectMode('jp-en', this)">
-                    <span class="mode-icon">🔄</span>日 → 英
+                    <span class="mode-icon">🔄</span><span>日→英</span>
                 </button>
                 <button class="mode-btn" onclick="selectMode('flash', this)">
-                    <span class="mode-icon">📇</span>カード
+                    <span class="mode-icon">📇</span><span>カード</span>
                 </button>
                 <button class="mode-btn" onclick="selectMode('typing', this)">
-                    <span class="mode-icon">⌨️</span>タイプ
+                    <span class="mode-icon">⌨️</span><span>タイプ</span>
                 </button>
             </div>
 
-            <div class="settings-area">
-                <div class="setting-row">
-                    <span>🔢 問題数</span>
-                    <select id="qCount" style="width:100px; margin:0; padding:5px; font-size:0.8rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+                <div style="flex:1; text-align:left;">
+                    <label style="color:#939bb4; font-weight:800; font-size:0.9rem;">問題数</label>
+                    <select id="qCount" style="width:100%; margin-top:5px; margin-bottom:0; font-size:0.9rem;">
                         <option value="all">全問</option>
                         <option value="10">10問</option>
-                        <option value="20">20問</option>
-                        <option value="30">30問</option>
                     </select>
                 </div>
+                <div style="flex:1; text-align:right; align-self:flex-end;">
+                     <button class="settings-toggle-btn" onclick="toggleSettings()">⚙️ 設定を開く</button>
+                </div>
+            </div>
+
+            <div id="settings-area" class="settings-area">
                 <div class="setting-row">
                     <span>🔀 シャッフル</span>
                     <label class="switch"><input type="checkbox" id="shuffleCheck" checked><span class="slider"></span></label>
@@ -310,9 +319,7 @@
             sel.appendChild(opt);
         });
         
-        // グローバルにUnitデータを保存
         unitData = units;
-
         document.getElementById('data-status').textContent = "✅ Ready";
         showScreen('screen-start');
     }
@@ -342,10 +349,21 @@
         setTimeout(load, 1000);
     }
 
-    // ★モード選択ボタンの制御
+    // ★設定エリアの表示切替
+    function toggleSettings() {
+        const area = document.getElementById('settings-area');
+        const btn = document.querySelector('.settings-toggle-btn');
+        if (area.style.display === 'block') {
+            area.style.display = 'none';
+            btn.textContent = '⚙️ 設定を開く';
+        } else {
+            area.style.display = 'block';
+            btn.textContent = '⚙️ 設定を閉じる';
+        }
+    }
+
     function selectMode(selectedMode, btn) {
         mode = selectedMode;
-        // ボタンの見た目を更新
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
@@ -361,14 +379,10 @@
 
         if(speechSynthesis.paused) speechSynthesis.resume();
 
-        // Unitの全データを取得
         let sourceList = [...unitData[unit]];
-
-        // シャッフル
         const doShuffle = document.getElementById('shuffleCheck').checked;
         if(doShuffle) sourceList.sort(() => Math.random() - 0.5);
 
-        // ★問題数でカット
         const qCount = document.getElementById('qCount').value;
         if(qCount !== 'all') {
             sourceList = sourceList.slice(0, parseInt(qCount));
@@ -400,7 +414,6 @@
         const hText = document.getElementById('h-text');
         hText.textContent = "";
 
-        // ★フラッシュカードも自動再生対象に追加
         if(mode === 'en-jp' || mode === 'flash') {
             qText.textContent = currentWord.en;
             if(document.getElementById('autoPlayCheck').checked) {

@@ -38,7 +38,7 @@
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background: var(--bg); display: none; flex-direction: column;
         align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; z-index: 20;
-        overflow-y: auto; /* 設定が多い場合スクロール */
+        overflow-y: auto;
     }
     .screen.active { display: flex; }
 
@@ -163,7 +163,9 @@
                 </div>
                 <div class="setting-row">
                     <span>🎙️ 音声</span>
-                    <select id="voiceSelect" style="width:120px; margin:0; padding:5px; font-size:0.8rem;"></select>
+                    <select id="voiceSelect" style="width:120px; margin:0; padding:5px; font-size:0.8rem;">
+                        <option value="">Default</option>
+                    </select>
                 </div>
             </div>
             
@@ -259,23 +261,27 @@
         showScreen('screen-start');
     }
 
-    // 音声リスト取得
+    // 音声リスト取得 (頑丈バージョン)
     function initVoices() {
         const load = () => {
             availableVoices = speechSynthesis.getVoices();
             const sel = document.getElementById('voiceSelect');
-            sel.innerHTML = '';
-            // 英語っぽい声だけ抽出
+            // すでに選択肢がある場合はリセットしない（チラつき防止）
+            if(sel.options.length > 1 && availableVoices.length > 0) return;
+            
+            sel.innerHTML = '<option value="">Default</option>';
             const enVoices = availableVoices.filter(v => v.lang.includes('en'));
             (enVoices.length ? enVoices : availableVoices).forEach(v => {
                 const opt = document.createElement('option');
                 opt.value = v.name; opt.textContent = v.name.substr(0, 15);
-                if(v.name.includes('Google') || v.default) opt.selected = true;
+                if(v.default) opt.selected = true;
                 sel.appendChild(opt);
             });
         };
         speechSynthesis.onvoiceschanged = load;
         load();
+        // ロードが遅い場合のための保険
+        setTimeout(load, 1000);
     }
 
     function showScreen(id) {
@@ -287,6 +293,9 @@
         const unit = document.getElementById('unitSelect').value;
         mode = document.getElementById('modeSelect').value;
         if(!unit) return;
+
+        // モバイル対応：音声エンジンのウェイクアップ
+        if(speechSynthesis.paused) speechSynthesis.resume();
 
         // シャッフル設定
         const doShuffle = document.getElementById('shuffleCheck').checked;
@@ -323,7 +332,10 @@
         // モード別表示
         if(mode === 'en-jp' || mode === 'flash') {
             qText.textContent = currentWord.en;
-            if(mode === 'en-jp' && document.getElementById('autoPlayCheck').checked) speakCurrent();
+            if(mode === 'en-jp' && document.getElementById('autoPlayCheck').checked) {
+                // 少し遅延させて確実に再生
+                setTimeout(speakCurrent, 100);
+            }
         } else {
             // jp-en または typing
             qText.textContent = currentWord.ja;
@@ -404,15 +416,25 @@
         renderQuestion();
     }
 
+    // 頑丈になった読み上げ関数
     function speakCurrent() {
+        // 重複再生防止
+        speechSynthesis.cancel();
+
         const u = new SpeechSynthesisUtterance(currentWord.en);
         u.lang = 'en-US';
-        // 設定値の反映
-        u.rate = document.getElementById('rateSlider').value;
+        
+        // 速度設定（数値として確実に取得）
+        const rateVal = parseFloat(document.getElementById('rateSlider').value);
+        u.rate = isNaN(rateVal) ? 1.0 : rateVal;
+
+        // 音声設定（選択されている場合のみ適用）
         const vName = document.getElementById('voiceSelect').value;
-        const v = availableVoices.find(x => x.name === vName);
-        if(v) u.voice = v;
-        speechSynthesis.cancel();
+        if(vName && availableVoices.length > 0) {
+            const v = availableVoices.find(x => x.name === vName);
+            if(v) u.voice = v;
+        }
+
         speechSynthesis.speak(u);
     }
     

@@ -62,9 +62,9 @@
     }
     .big-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(46, 61, 128, 0.3); }
 
-    /* ★モード選択ボタン (横一列コンパクト版) */
+    /* モード選択ボタン */
     .mode-grid {
-        display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-bottom: 1rem; width: 100%;
+        display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-bottom: 0.8rem; width: 100%;
     }
     .mode-btn {
         background: white; border: 2px solid #edeff4; border-radius: 12px;
@@ -78,13 +78,42 @@
     }
     .mode-icon { font-size: 1.2rem; margin-bottom: 2px; }
 
-    /* 設定エリア (折りたたみ式) */
+    /* ★メインオプションバー (横一列) */
+    .options-bar {
+        display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 8px; margin-bottom: 1rem; width: 100%;
+        background: #f8f9fc; padding: 10px; border-radius: 15px; box-sizing: border-box;
+        align-items: center;
+    }
+    .opt-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+    .opt-label { font-size: 0.75rem; color: #7a82a0; font-weight: 800; }
+    
+    /* 小型セレクト */
+    .small-select {
+        width: 100%; padding: 0.3rem; margin: 0; font-size: 0.9rem; border-radius: 8px; text-align: center;
+        background: white; border: 2px solid #dce2f2; color: var(--primary);
+    }
+
+    /* 小型トグル */
+    .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #ccc; transition: .4s; border-radius: 34px;
+    }
+    .slider:before {
+        position: absolute; content: ""; height: 18px; width: 18px;
+        left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(18px); }
+
+    /* 設定エリア (折りたたみ) */
     .settings-wrapper { width: 100%; text-align: right; margin-bottom: 5px; }
     .settings-toggle-btn {
-        background: none; border: none; color: #939bb4; font-weight: bold; cursor: pointer; font-size: 0.9rem;
+        background: none; border: none; color: #939bb4; font-weight: bold; cursor: pointer; font-size: 0.85rem; padding: 5px;
     }
     .settings-area {
-        display: none; /* デフォルト非表示 */
+        display: none;
         border: 2px dashed #dce2f2; border-radius: 15px; padding: 0.8rem;
         margin-bottom: 0.8rem; text-align: left; background: rgba(255,255,255,0.8); width: 100%; box-sizing: border-box;
     }
@@ -92,19 +121,6 @@
         display: flex; justify-content: space-between; align-items: center;
         margin-bottom: 8px; font-weight: 800; color: #7a82a0; font-size: 0.85rem;
     }
-    /* トグル */
-    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider {
-        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-        background-color: #ccc; transition: .4s; border-radius: 34px;
-    }
-    .slider:before {
-        position: absolute; content: ""; height: 16px; width: 16px;
-        left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
-    }
-    input:checked + .slider { background-color: var(--primary); }
-    input:checked + .slider:before { transform: translateX(18px); }
 
     /* ゲーム画面 */
     .flashcard {
@@ -145,7 +161,7 @@
     @media (max-width: 600px) {
         .options-grid { grid-template-columns: 1fr; }
         .word-text { font-size: 1.8rem; }
-        .mode-btn span { font-size: 0.7rem; } /* 文字サイズ調整 */
+        .mode-btn span { font-size: 0.7rem; }
     }
 </style>
 </head>
@@ -187,28 +203,31 @@
                 </button>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
-                <div style="flex:1; text-align:left;">
-                    <label style="color:#939bb4; font-weight:800; font-size:0.9rem;">問題数</label>
-                    <select id="qCount" style="width:100%; margin-top:5px; margin-bottom:0; font-size:0.9rem;">
+            <div class="options-bar">
+                <div class="opt-item">
+                    <span class="opt-label">問題数</span>
+                    <select id="qCount" class="small-select">
                         <option value="all">全問</option>
                         <option value="10">10問</option>
                     </select>
                 </div>
-                <div style="flex:1; text-align:right; align-self:flex-end;">
-                     <button class="settings-toggle-btn" onclick="toggleSettings()">⚙️ 設定を開く</button>
+                <div class="opt-item">
+                    <span class="opt-label">🔀 シャッフル</span>
+                    <label class="switch"><input type="checkbox" id="shuffleCheck" checked><span class="slider"></span></label>
+                </div>
+                <div class="opt-item">
+                    <span class="opt-label">🔊 自動読上</span>
+                    <label class="switch"><input type="checkbox" id="autoPlayCheck" checked><span class="slider"></span></label>
                 </div>
             </div>
 
+            <button class="big-btn" onclick="startGame()">START</button>
+
+            <div class="settings-wrapper" style="margin-top:10px;">
+                <button class="settings-toggle-btn" onclick="toggleSettings()">⚙️ 詳細設定 (速度・声)</button>
+            </div>
+
             <div id="settings-area" class="settings-area">
-                <div class="setting-row">
-                    <span>🔀 シャッフル</span>
-                    <label class="switch"><input type="checkbox" id="shuffleCheck" checked><span class="slider"></span></label>
-                </div>
-                <div class="setting-row">
-                    <span>🔊 自動読み上げ</span>
-                    <label class="switch"><input type="checkbox" id="autoPlayCheck" checked><span class="slider"></span></label>
-                </div>
                 <div class="setting-row" style="flex-direction:column; align-items:stretch;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                         <span>🗣️ 速度</span><span id="rateVal">1.0</span>
@@ -221,7 +240,6 @@
                 </div>
             </div>
             
-            <button class="big-btn" onclick="startGame()">START</button>
         </div>
     </div>
 
@@ -349,16 +367,15 @@
         setTimeout(load, 1000);
     }
 
-    // ★設定エリアの表示切替
     function toggleSettings() {
         const area = document.getElementById('settings-area');
         const btn = document.querySelector('.settings-toggle-btn');
         if (area.style.display === 'block') {
             area.style.display = 'none';
-            btn.textContent = '⚙️ 設定を開く';
+            btn.textContent = '⚙️ 詳細設定 (速度・声)';
         } else {
             area.style.display = 'block';
-            btn.textContent = '⚙️ 設定を閉じる';
+            btn.textContent = '🔼 設定を閉じる';
         }
     }
 

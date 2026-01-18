@@ -11,6 +11,7 @@
     :root {
         --primary: #5d75d6; --accent: #6ce5e8; --bg: #fcfdfd;
         --card: #ffffff; --text: #4a4a4a; --wrong: #ff6b6b; --correct: #4ecdc4;
+        --report: #28a745; /* 報告ボタン用の緑 */
     }
     body {
         font-family: "M PLUS Rounded 1c", sans-serif;
@@ -56,11 +57,21 @@
     }
     .big-btn {
         background: var(--primary); color: white; border: none;
-        padding: 0.8rem 2rem; font-size: 1.3rem; border-radius: 50px;
+        padding: 0.8rem 2rem; font-size: 1.2rem; border-radius: 50px;
         font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 rgba(46, 61, 128, 0.3);
         transition: transform 0.1s; margin-top: 10px; width: 100%;
     }
     .big-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(46, 61, 128, 0.3); }
+
+    /* 報告ボタン */
+    .report-btn {
+        background: var(--report); color: white; border: none;
+        padding: 0.8rem 2rem; font-size: 1.2rem; border-radius: 50px;
+        font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 rgba(34, 139, 34, 0.3);
+        transition: transform 0.1s; margin-top: 15px; width: 100%;
+    }
+    .report-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(34, 139, 34, 0.3); }
+
 
     /* モード選択ボタン */
     .mode-grid {
@@ -78,7 +89,7 @@
     }
     .mode-icon { font-size: 1.2rem; margin-bottom: 2px; }
 
-    /* ★メインオプションバー (横一列) */
+    /* メインオプションバー */
     .options-bar {
         display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 8px; margin-bottom: 1rem; width: 100%;
         background: #f8f9fc; padding: 10px; border-radius: 15px; box-sizing: border-box;
@@ -87,13 +98,10 @@
     .opt-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
     .opt-label { font-size: 0.75rem; color: #7a82a0; font-weight: 800; }
     
-    /* 小型セレクト */
     .small-select {
         width: 100%; padding: 0.3rem; margin: 0; font-size: 0.9rem; border-radius: 8px; text-align: center;
         background: white; border: 2px solid #dce2f2; color: var(--primary);
     }
-
-    /* 小型トグル */
     .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
@@ -101,13 +109,13 @@
         background-color: #ccc; transition: .4s; border-radius: 34px;
     }
     .slider:before {
-        position: absolute; content: ""; height: 18px; width: 18px;
+        position: absolute; content: ""; height: 16px; width: 16px;
         left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
     }
     input:checked + .slider { background-color: var(--primary); }
     input:checked + .slider:before { transform: translateX(18px); }
 
-    /* 設定エリア (折りたたみ) */
+    /* 設定エリア */
     .settings-wrapper { width: 100%; text-align: right; margin-bottom: 5px; }
     .settings-toggle-btn {
         background: none; border: none; color: #939bb4; font-weight: bold; cursor: pointer; font-size: 0.85rem; padding: 5px;
@@ -278,6 +286,8 @@
                 <div id="mistake-list"></div>
             </div>
 
+            <button class="report-btn" onclick="sendReport()">📮 先生に報告する</button>
+
             <button class="big-btn" onclick="location.reload()">↩ スタートに戻る</button>
         </div>
     </div>
@@ -286,9 +296,15 @@
 
 <script>
     // ==========================================
-    // 先生のURL (変更なし)
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQkjW85DByBOi5XpuXoGq1OrHytiO2tJNdariA_GDO6ETQCDSgFGsJuy427qxrjN6kKOElWMEdIg3XC/pub?output=csv";
+    // 先生のフォーム情報 (自動入力用)
+    const FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdO7Dd_KYb-jtpwyEPmEyICRWZjNESsJ7b7oUahDym96HRcnQ/viewform";
+    const ENTRY_NAME = "entry.1354700989";
+    const ENTRY_UNIT = "entry.103929395";
+    const ENTRY_SCORE = "entry.375133785";
+    const ENTRY_WORDS = "entry.1661621004";
     // ==========================================
+    // 先生のシートURL
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQkjW85DByBOi5XpuXoGq1OrHytiO2tJNdariA_GDO6ETQCDSgFGsJuy427qxrjN6kKOElWMEdIg3XC/pub?output=csv";
 
     let allData = [], unitData = [], playQueue = [], wrongWords = [];
     let currentIndex = 0, score = 0, mode = "en-jp", currentWord = null;
@@ -553,6 +569,29 @@
             if(v) u.voice = v;
         }
         speechSynthesis.speak(u);
+    }
+
+    // ★先生にレポート送信機能 (NEW!)
+    function sendReport() {
+        const unitName = document.getElementById('unitSelect').value;
+        const finalScore = `${score} / ${playQueue.length}`;
+        
+        // 間違えた単語リストの作成
+        let mistakesStr = "なし";
+        if (wrongWords.length > 0) {
+            mistakesStr = Array.from(new Set(wrongWords.map(w => w.en))).join(", ");
+        }
+
+        // URLパラメータの構築
+        const params = new URLSearchParams();
+        params.append(ENTRY_UNIT, unitName);
+        params.append(ENTRY_SCORE, finalScore);
+        params.append(ENTRY_WORDS, mistakesStr);
+        // 名前は生徒に入力させるので空のまま
+
+        // フォームを開く
+        const finalUrl = `${FORM_BASE_URL}?${params.toString()}`;
+        window.open(finalUrl, '_blank');
     }
 </script>
 </body>

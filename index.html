@@ -285,9 +285,15 @@
                 <div id="mistake-list"></div>
             </div>
 
+            <button class="big-btn" onclick="startGame()" style="background:var(--accent); margin-bottom:10px; box-shadow: 0 5px 0 rgba(70, 200, 200, 0.3);">
+                🔄 もう一度挑戦する
+            </button>
+
             <button class="report-btn" onclick="sendReport()">📮 先生に報告する</button>
 
-            <button class="big-btn" onclick="location.reload()">↩ スタートに戻る</button>
+            <button class="big-btn" onclick="location.reload()" style="background:#ccc; font-size:1rem; margin-top:20px; box-shadow: 0 5px 0 #999;">
+                ↩ スタートに戻る
+            </button>
         </div>
     </div>
 
@@ -570,25 +576,20 @@
         speechSynthesis.speak(u);
     }
 
-    // ★先生にレポート送信機能 (NEW!)
     function sendReport() {
         const unitName = document.getElementById('unitSelect').value;
         const finalScore = `${score} / ${playQueue.length}`;
         
-        // 間違えた単語リストの作成
         let mistakesStr = "なし";
         if (wrongWords.length > 0) {
             mistakesStr = Array.from(new Set(wrongWords.map(w => w.en))).join(", ");
         }
 
-        // URLパラメータの構築
         const params = new URLSearchParams();
         params.append(ENTRY_UNIT, unitName);
         params.append(ENTRY_SCORE, finalScore);
         params.append(ENTRY_WORDS, mistakesStr);
-        // 名前は生徒に入力させるので空のまま
 
-        // フォームを開く
         const finalUrl = `${FORM_BASE_URL}?${params.toString()}`;
         window.open(finalUrl, '_blank');
     }

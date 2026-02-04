@@ -192,21 +192,21 @@
     <div id="screen-start" class="screen">
         <div class="card-box">
             <label style="display:block; text-align:left; color:#939bb4; font-weight:800; margin-bottom:5px;">Unit Select</label>
-            <select id="unitSelect"></select>
+            <select id="unitSelect" onchange="localStorage.setItem('nico_unit', this.value)"></select>
 
             <label style="display:block; text-align:left; color:#939bb4; font-weight:800; margin-bottom:5px;">Mode</label>
             <div class="mode-grid">
-                <button class="mode-btn active" onclick="selectMode('en-jp', this)">
+                <button class="mode-btn active" data-mode="en-jp" onclick="selectMode('en-jp', this)">
                     <span class="mode-icon">📝</span><span>英→日</span>
                 </button>
-                <button class="mode-btn" onclick="selectMode('jp-en', this)">
+                <button class="mode-btn" data-mode="jp-en" onclick="selectMode('jp-en', this)">
                     <span class="mode-icon">🔄</span><span>日→英</span>
                 </button>
-                <button class="mode-btn" onclick="selectMode('flash', this)">
-                    <span class="mode-icon">📇</span><span>カード</span>
+                <button class="mode-btn" data-mode="flash" onclick="selectMode('flash', this)">
+                    <span class="mode-icon">📇</span><span>発音</span>
                 </button>
-                <button class="mode-btn" onclick="selectMode('typing', this)">
-                    <span class="mode-icon">⌨️</span><span>タイプ</span>
+                <button class="mode-btn" data-mode="typing" onclick="selectMode('typing', this)">
+                    <span class="mode-icon">⌨️</span><span>スペリング</span>
                 </button>
             </div>
 
@@ -360,6 +360,18 @@
         
         unitData = units;
         document.getElementById('data-status').textContent = "✅ Ready";
+
+        // ★前回の設定を復元する処理 (NEW)
+        const lastUnit = localStorage.getItem('nico_unit');
+        if(lastUnit && units[lastUnit]) {
+            sel.value = lastUnit;
+        }
+        const lastMode = localStorage.getItem('nico_mode') || 'en-jp';
+        const targetBtn = document.querySelector(`.mode-btn[data-mode="${lastMode}"]`);
+        if(targetBtn) {
+            selectMode(lastMode, targetBtn);
+        }
+
         showScreen('screen-start');
     }
 
@@ -402,6 +414,8 @@
 
     function selectMode(selectedMode, btn) {
         mode = selectedMode;
+        // ★モード選択を記憶 (NEW)
+        localStorage.setItem('nico_mode', mode);
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
@@ -414,6 +428,9 @@
     function startGame() {
         const unit = document.getElementById('unitSelect').value;
         if(!unit) return;
+        
+        // 念のためUnitもここで再保存
+        localStorage.setItem('nico_unit', unit);
 
         if(speechSynthesis.paused) speechSynthesis.resume();
 
